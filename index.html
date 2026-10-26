@@ -5,196 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#2563eb">
     <title>Allepeed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #f5f5f5; --surface: #ffffff; --text: #111111; --muted: #737373; --border: #e5e5e5;
-            --primary: #2563eb; --icon-bg: #e5e7eb; --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            --red-alert: #ef4444; --green-ok: #10b981;
-        }
-        [data-theme="dark"] {
-            --bg: #121212; --surface: #1e1e1e; --text: #f5f5f5; --muted: #a3a3a3; --border: #333333;
-            --icon-bg: #333333; --card-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
-        header { height: 80px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; padding-top: env(safe-area-inset-top); }
-        .profile-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; cursor: pointer; border: none; }
-        .logo-center { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
-        .logo-center .black { color: var(--text); } .logo-center .blue { color: var(--primary); }
-        .header-controls { display: flex; gap: 15px; }
-        .control-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .control-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--icon-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text); border: none; transition: transform 0.2s; }
-        .control-icon:active { transform: scale(0.9); }
-        .control-label { font-size: 9px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; position: relative; }
-        .screen { display: none; animation: fadeIn 0.3s; height: 100%; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .carousel-wrapper { position: relative; height: 140px; margin-bottom: 20px; width: 100%; }
-        .carousel-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 16px; padding: 20px; color: white; display: flex; flex-direction: column; justify-content: center; box-shadow: var(--card-shadow); opacity: 0; transition: opacity 0.8s; }
-        .carousel-card.active { opacity: 1; z-index: 2; }
-        .carousel-card h2 { font-size: 18px; margin-bottom: 8px; }
-        .carousel-card p { font-size: 13px; opacity: 0.9; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .dash-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px; box-shadow: var(--card-shadow); text-align: center; }
-        .dash-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
-        .progress-number { font-size: 32px; font-weight: 900; color: var(--primary); }
-        .testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 25px; }
-        .testimonial-text { font-size: 14px; font-style: italic; line-height: 1.5; transition: opacity 0.5s; }
-        .brain-container { display: flex; gap: 15px; }
-        .brain-box { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 15px; text-align: center; }
-        .brain-visual { position: relative; width: 60px; height: 60px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+        :root { --bg: #f5f5f5; --surface: #fff; --text: #111; --muted: #737373; --border: #e5e5e5; --primary: #2563eb; --red: #ef4444; --green: #10b981; }
+        [data-theme="dark"] { --bg: #121212; --surface: #1e1e1e; --text: #f5f5f5; --muted: #a3a3a3; --border: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { height: 80px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; }
+        .profile-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: bold; border: none; }
+        .logo { font-weight: 800; font-size: 22px; } .logo span { color: var(--primary); }
+        .controls { display: flex; gap: 15px; } .ctrl { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .ctrl button { width: 36px; height: 36px; border-radius: 50%; background: var(--border); border: none; color: var(--text); }
+        .ctrl span { font-size: 9px; font-weight: 700; color: var(--muted); }
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
+        .screen { display: none; height: 100%; } .screen.active { display: block; }
+        .carousel { position: relative; height: 140px; margin-bottom: 20px; }
+        .card { position: absolute; width: 100%; height: 100%; border-radius: 16px; padding: 20px; color: #fff; opacity: 0; transition: opacity 0.8s; display: flex; flex-direction: column; justify-content: center; }
+        .card.active { opacity: 1; z-index: 2; }
+        .card h2 { margin-bottom: 8px; } .card p { font-size: 13px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px; text-align: center; }
+        .box h3 { font-size: 12px; color: var(--muted); margin-bottom: 10px; } .box .num { font-size: 32px; font-weight: 900; color: var(--primary); }
+        .test { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 25px; font-style: italic; font-size: 14px; }
+        .brains { display: flex; gap: 15px; }
+        .brain { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 15px; text-align: center; }
+        .b-visual { position: relative; width: 60px; height: 60px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
         .ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px dashed; animation: spin 6s linear infinite; }
-        .brain-icon { font-size: 30px; animation: spin-reverse 4s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } } @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-        .brain-left .ring, .brain-left .brain-icon { color: var(--red-alert); border-color: var(--red-alert); }
-        .brain-right .ring, .brain-right .brain-icon { color: var(--green-ok); border-color: var(--green-ok); }
-        .brain-desc { font-size: 11px; color: var(--muted); min-height: 45px; }
-        .timer-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; margin-top: 50px; }
-        .timer-display { font-size: 80px; font-weight: 900; color: var(--primary); margin-bottom: 30px; font-variant-numeric: tabular-nums; }
-        .btn-main { width: 100%; max-width: 300px; padding: 18px; border-radius: 16px; border: none; background: var(--primary); color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-stop { background: var(--red-alert); }
-        .post { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .post-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .post-text { font-size: 14px; line-height: 1.4; }
-        .fab { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; z-index: 90; }
-        .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-        .bar { width: 12%; background: var(--primary); border-radius: 4px 4px 0 0; opacity: 0.8; }
-        .progress-bar-row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
-        .color-box { width: 20px; height: 20px; border-radius: 4px; }
-        footer { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 600; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 20px; }
-        .ai-popup { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -200px); width: 92%; max-width: 400px; background: #111; color: white; padding: 16px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; opacity: 0; pointer-events: none; }
-        .ai-popup.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-        .popup-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .popup-title { font-size: 12px; font-weight: 700; color: #60a5fa; text-transform: uppercase; }
-        .close-btn { background: none; border: none; color: #a3a3a3; font-size: 18px; cursor: pointer; }
-        .popup-message { font-size: 15px; line-height: 1.4; min-height: 40px; margin-bottom: 15px; }
-        .action-area { display: flex; gap: 10px; opacity: 0; transition: opacity 0.3s; }
-        .action-area.visible { opacity: 1; }
-        .btn-chat { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .btn-yes { background: #2563eb; color: white; } .btn-no { background: #333; color: white; }
-        .game-container { display: none; margin-top: 10px; background: #000; border-radius: 12px; padding: 15px; text-align: center; }
-        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
-        .game-tile { aspect-ratio: 1; border-radius: 8px; background: #333; cursor: pointer; }
-        .game-score { color: #aaa; font-size: 12px; font-weight: bold; }
-        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s; }
-        .sidebar-overlay.active { display: block; opacity: 1; }
-        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--surface); z-index: 1001; transition: left 0.3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+        .b-icon { font-size: 30px; animation: spin-rev 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } } @keyframes spin-rev { 100% { transform: rotate(-360deg); } }
+        .b-left .ring, .b-left .b-icon { color: var(--red); border-color: var(--red); } .b-right .ring, .b-right .b-icon { color: var(--green); border-color: var(--green); }
+        .b-desc { font-size: 11px; color: var(--muted); min-height: 45px; }
+        .timer-box { display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+        .time { font-size: 80px; font-weight: 900; color: var(--primary); margin-bottom: 30px; }
+        .btn { width: 100%; max-width: 300px; padding: 18px; border-radius: 16px; border: none; background: var(--primary); color: #fff; font-size: 18px; font-weight: bold; }
+        .btn.stop { background: var(--red); }
+        .chart { display: flex; align-items: flex-end; justify-content: space-between; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .bar { width: 12%; background: var(--primary); border-radius: 4px 4px 0 0; }
+        .row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .dot { width: 20px; height: 20px; border-radius: 4px; }
+        footer { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+        .nav { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 600; }
+        .nav.active { color: var(--primary); } .nav i { font-size: 20px; }
+        .popup { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -200px); width: 92%; max-width: 400px; background: #111; color: #fff; padding: 16px; border-radius: 16px; z-index: 1000; transition: transform 0.4s, opacity 0.3s; opacity: 0; pointer-events: none; }
+        .popup.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+        .p-head { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 12px; color: #60a5fa; font-weight: 700; }
+        .p-close { background: none; border: none; color: #a3a3a3; font-size: 18px; }
+        .p-msg { font-size: 15px; min-height: 40px; margin-bottom: 15px; }
+        .p-actions { display: flex; gap: 10px; opacity: 0; transition: opacity 0.3s; }
+        .p-actions.visible { opacity: 1; }
+        .p-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: bold; background: var(--primary); color: #fff; }
+        .p-btn.no { background: #333; }
+        .game { display: none; margin-top: 10px; background: #000; border-radius: 12px; padding: 15px; text-align: center; }
+        .g-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .g-tile { aspect-ratio: 1; border-radius: 8px; background: #333; }
+        .g-score { color: #aaa; font-size: 12px; font-weight: bold; }
+        .side-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
+        .side-overlay.active { display: block; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--surface); z-index: 1001; transition: left 0.3s; display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
-        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .sidebar-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; font-size: 32px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
-        .sidebar-menu { list-style: none; padding: 15px 0; flex: 1; }
-        .sidebar-menu li { padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 15px; cursor: pointer; }
-        .sidebar-menu li:hover { background: var(--bg); }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .s-head { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .s-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 32px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .s-menu { list-style: none; padding: 15px 0; flex: 1; }
+        .s-menu li { padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 15px; }
         .cursor { display: inline-block; width: 8px; height: 14px; background: #60a5fa; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     </style>
 </head><body>
-
     <header>
         <button class="profile-btn" onclick="openSidebar()">M</button>
-        <div class="logo-center"><span class="black">alle</span><span class="blue">peed</span></div>
-        <div class="header-controls">
-            <div class="control-item"><button class="control-icon" onclick="toggleTheme()"><i class="fa-solid fa-gear"></i></button><span class="control-label" id="theme-label">Dark</span></div>
-            <div class="control-item"><button class="control-icon" style="color: var(--primary);" onclick="openWelcomeAI()"><i class="fa-solid fa-star"></i></button><span class="control-label">AI</span></div>
+        <div class="logo"><span style="color:var(--text)">alle</span><span>peed</span></div>
+        <div class="controls">
+            <div class="ctrl"><button onclick="toggleTheme()"><i class="fa-solid fa-gear"></i></button><span id="theme-label">Dark</span></div>
+            <div class="ctrl"><button style="color:var(--primary)" onclick="startAI()"><i class="fa-solid fa-star"></i></button><span>AI</span></div>
         </div>
     </header>
 
     <main>
         <div id="view-home" class="screen active">
-            <div class="carousel-wrapper">
-                <div class="carousel-card active" style="background: linear-gradient(135deg, var(--primary), #1e40af);"><h2>Welcome to Allepeed</h2><p>We help you find meaning in Maladaptive Daydreaming.</p></div>
-                <div class="carousel-card" style="background: linear-gradient(135deg, #10b981, #047857);"><h2>You are not alone.</h2><p>Thousands are fighting the same battle.</p></div>
+            <div class="carousel">
+                <div class="card active" style="background: linear-gradient(135deg, var(--primary), #1e40af);"><h2>Welcome to Allepeed</h2><p>We help you find meaning in Maladaptive Daydreaming.</p></div>
+                <div class="card" style="background: linear-gradient(135deg, var(--green), #047857);"><h2>You are not alone.</h2><p>Thousands are fighting the same battle.</p></div>
             </div>
-            <div class="dashboard-grid">
-                <div class="dash-box"><div class="dash-title">Progress</div><div class="progress-number">12</div></div>
-                <div class="dash-box"><div class="dash-title">Focus</div><i class="fa-regular fa-clock" style="font-size:32px; color:var(--primary);"></i></div>
+            <div class="grid">
+                <div class="box"><h3>Progress</h3><div class="num">12</div></div>
+                <div class="box"><h3>Focus</h3><i class="fa-regular fa-clock" style="font-size:32px;color:var(--primary)"></i></div>
             </div>
-            <div class="testimonial-card"><div class="testimonial-text" id="testimonial-text">"I used to lose 4 hours a day. The focus timer gave me a reason to stay in the real world."</div></div>
-            <div class="brain-container">
-                <div class="brain-box brain-left"><div class="brain-visual"><div class="ring"></div><i class="fa-solid fa-brain brain-icon"></i></div><div class="brain-desc">Without Allepeed, your brain is filled with misery...</div></div>
-                <div class="brain-box brain-right"><div class="brain-visual"><div class="ring"></div><i class="fa-solid fa-brain brain-icon"></i></div><div class="brain-desc">Your brain becomes healthy and grounded after using Allepeed.</div></div>
-            </div>
-        </div>
-
-        <div id="view-focus" class="screen">
-            <div class="timer-container">
-                <div class="timer-display" id="timer">25:00</div>
-                <button class="btn-main" id="start-btn" onclick="handleFocusButton()">Start Focus</button>
+            <div class="test" id="test-text">"I used to lose 4 hours a day. The focus timer gave me a reason to stay in the real world."</div>
+            <div class="brains">
+                <div class="brain b-left"><div class="b-visual"><div class="ring"></div><i class="fa-solid fa-brain b-icon"></i></div><div class="b-desc">Without Allepeed, your brain is filled with misery...</div></div>
+                <div class="brain b-right"><div class="b-visual"><div class="ring"></div><i class="fa-solid fa-brain b-icon"></i></div><div class="b-desc">Your brain becomes healthy and grounded after using Allepeed.</div></div>
             </div>
         </div>
-
-        <div id="view-community" class="screen">
-            <div id="feed-container">
-                <div class="post"><div class="post-header"><div class="post-avatar">A</div><strong>Anonymous</strong></div><div class="post-text">Today I stayed present for 30 minutes. The timer helped.</div></div>
-            </div>
-        </div>
-
+        <div id="view-focus" class="screen"><div class="timer-box"><div class="time" id="timer">25:00</div><button class="btn" id="start-btn" onclick="handleFocus()">Start Focus</button></div></div>
+        <div id="view-community" class="screen"></div>
         <div id="view-progress" class="screen">
-            <h2 style="margin-bottom:15px;">Weekly Focus Activity</h2>
-            <div class="chart-container">
-                <div class="bar" style="height: 40%;"></div><div class="bar" style="height: 70%;"></div><div class="bar" style="height: 30%;"></div><div class="bar" style="height: 90%;"></div><div class="bar" style="height: 60%;"></div><div class="bar" style="height: 20%;"></div><div class="bar" style="height: 80%;"></div>
-            </div>
-            <h2 style="margin-bottom:15px;">Grounding Colors</h2>
-            <div class="progress-bar-row"><div class="color-box" style="background:var(--green-ok);"></div><span>Strong and Present</span></div>
-            <div class="progress-bar-row"><div class="color-box" style="background:#f59e0b;"></div><span>Struggling but Trying</span></div>
-            <div class="progress-bar-row"><div class="color-box" style="background:var(--red-alert);"></div><span>Daydreaming Heavily</span></div>
+            <div class="chart"><div class="bar" style="height:40%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:30%"></div><div class="bar" style="height:90%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:20%"></div><div class="bar" style="height:80%"></div></div>
         </div>
     </main>
 
-    <div id="ai-popup" class="ai-popup">
-        <div class="popup-header">
-            <span class="popup-title"><i class="fa-solid fa-star"></i> Allepeed AI</span>
-            <button class="close-btn" onclick="closeAI()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="popup-message" id="popup-text"></div>
-        <div class="action-area" id="action-area"></div>
-        <div id="game-area" class="game-container">
-            <div class="game-score">Score: <span id="score">0</span></div>
-            <div class="game-grid" id="grid"></div>
-            <p style="font-size: 11px; color: #777; margin-top: 10px;">Click the odd color out.</p>
-        </div>
+    <div id="ai-popup" class="popup">
+        <div class="p-head"><span><i class="fa-solid fa-star"></i> Allepeed AI</span><button class="p-close" onclick="closeAI()"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="p-msg" id="ai-text"></div>
+        <div class="p-actions" id="ai-actions"></div>
+        <div id="game-box" class="game"><div class="g-score">Score: <span id="g-score">0</span></div><div class="g-grid" id="g-grid"></div></div>
     </div>
 
-    <div class="fab" id="fab" onclick="createPost()" style="display:none;"><i class="fa-solid fa-plus"></i></div>
-
-    <div id="overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div id="overlay" class="side-overlay" onclick="closeSidebar()"></div>
     <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-avatar">M</div>
-            <button style="padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text);">Edit Profile</button>
-        </div>
-        <ul class="sidebar-menu">
-            <li onclick="switchView('home')"><i class="fa-solid fa-house"></i> Home</li>
-            <li onclick="switchView('focus')"><i class="fa-solid fa-bolt"></i> Focus</li>
-            <li onclick="switchView('community')"><i class="fa-solid fa-users"></i> Community</li>
-            <li onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i> My Progress</li>
-            <li onclick="alert('App still in development.')"><i class="fa-solid fa-file-contract"></i> Terms</li>
-            <li onclick="alert('App still in development.')"><i class="fa-solid fa-gear"></i> Settings</li>
+        <div class="s-head"><div class="s-avatar">M</div></div>
+        <ul class="s-menu">
+            <li onclick="switchView('home')">Home</li>
+            <li onclick="switchView('focus')">Focus</li>
+            <li onclick="switchView('community')">Community</li>
+            <li onclick="switchView('progress')">My Progress</li>
         </ul>
     </div>
 
     <footer>
-        <div class="nav-item active" id="nav-home" onclick="switchView('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
-        <div class="nav-item" id="nav-focus" onclick="switchView('focus')"><i class="fa-solid fa-bolt"></i><span>Focus</span></div>
-        <div class="nav-item" id="nav-community" onclick="switchView('community')"><i class="fa-solid fa-users"></i><span>Community</span></div>
-        <div class="nav-item" id="nav-progress" onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i><span>Progress</span></div>
+        <div class="nav active" id="nav-home" onclick="switchView('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav" id="nav-focus" onclick="switchView('focus')"><i class="fa-solid fa-bolt"></i><span>Focus</span></div>
+        <div class="nav" id="nav-community" onclick="switchView('community')"><i class="fa-solid fa-users"></i><span>Community</span></div>
+        <div class="nav" id="nav-progress" onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i><span>Progress</span></div>
     </footer>
 
     <script>
-        let currentView = 'home';
-        let timeLeft = 25 * 60;
-        let timerInterval;
-        let isRunning = false;
-        let gameScore = 0;
+        let currentView = 'home', timeLeft = 25 * 60, timerInt, isRunning = false, gScore = 0;
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         function toggleTheme() {
@@ -207,231 +143,118 @@
         function switchView(view) {
             currentView = view;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav').forEach(n => n.classList.remove('active'));
             document.getElementById(`view-${view}`).classList.add('active');
             document.getElementById(`nav-${view}`).classList.add('active');
-            closeSidebar();
-            document.getElementById('fab').style.display = (view === 'community') ? 'flex' : 'none';
-            closeAI();
+            closeSidebar(); closeAI();
         }
 
-        const aiPopup = document.getElementById('ai-popup');
-        const popupText = document.getElementById('popup-text');
-        const actionArea = document.getElementById('action-area');
-        const gameArea = document.getElementById('game-area');
-        const grid = document.getElementById('grid');
+        function openSidebar() { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
 
-        function closeAI() { 
-            aiPopup.classList.remove('show'); 
-            gameArea.style.display = 'none';
-        }
+        const popup = document.getElementById('ai-popup'), aiText = document.getElementById('ai-text'), aiActions = document.getElementById('ai-actions'), gameBox = document.getElementById('game-box');
 
-        function typeMessage(text, buttonsHTML) {
-            popupText.innerHTML = '';
-            actionArea.innerHTML = '';
-            actionArea.classList.remove('visible');
-            gameArea.style.display = 'none';
-            let i = 0;
-            const cursor = document.createElement('span'); 
-            cursor.className = 'cursor'; 
-            popupText.appendChild(cursor);
+        function closeAI() { popup.classList.remove('show'); gameBox.style.display = 'none'; }
 
+        function typeMsg(text, buttonsHtml) {
+            aiText.innerHTML = ''; aiActions.innerHTML = ''; aiActions.classList.remove('visible'); gameBox.style.display = 'none';
+            let i = 0; const cursor = document.createElement('span'); cursor.className = 'cursor'; aiText.appendChild(cursor);
             function type() {
-                if (i < text.length) { 
-                    cursor.insertAdjacentText('beforebegin', text.charAt(i)); 
-                    i++; 
-                    setTimeout(type, 30); 
-                } 
-                else { 
-                    cursor.remove(); 
-                    if (buttonsHTML) { 
-                        actionArea.innerHTML = buttonsHTML; 
-                        actionArea.classList.add('visible'); 
-                    } 
-                }
+                if (i < text.length) { cursor.insertAdjacentText('beforebegin', text.charAt(i)); i++; setTimeout(type, 30); }
+                else { cursor.remove(); if (buttonsHtml) { aiActions.innerHTML = buttonsHtml; aiActions.classList.add('visible'); } }
             }
             setTimeout(type, 300);
         }
 
-        function openWelcomeAI() {
-            aiPopup.classList.add('show');
-            typeMessage("Hey Sankara, how was your day? Did you fall into MD again?", 
-                `<button class="btn-chat btn-yes" onclick="handleAIResponse('okay')">I'm okay</button>
-                 <button class="btn-chat btn-no" onclick="handleAIResponse('struggled')">I struggled</button>`);
+        function startAI() {
+            popup.classList.add('show');
+            typeMsg("Hey Sankara, how was your day? Did you slip into MD?", 
+                `<button class="p-btn" onclick="reply('okay')">I'm okay</button><button class="p-btn no" onclick="reply('struggled')">I struggled</button>`);
         }
 
-        function handleAIResponse(action) {
-            actionArea.innerHTML = '';
-            actionArea.classList.remove('visible');
-
+        function reply(action) {
+            aiActions.innerHTML = '';
             if (action === 'okay') {
-                typeMessage("That's great. Staying present is a win. Let's do a quick focus session to keep the momentum.", 
-                    `<button class="btn-chat btn-yes" onclick="switchView('focus'); closeAI();">Go to Focus</button>`);
-            } 
-            else if (action === 'struggled') {
-                typeMessage("I hear you. It's okay to struggle. Are you stuck in a daydream right now?", 
-                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('yes_md')">Yes</button>
-                     <button class="btn-chat btn-no" onclick="handleAIResponse('no_md')">No</button>`);
-            }
-            else if (action === 'yes_md') {
-                typeMessage("Let's pull you back. I am opening a quick game. Click the tile that has a different color.", 
-                    `<button class="btn-chat btn-yes" onclick="startGame()">Start Game</button>`);
-            }
-            else if (action === 'no_md') {
-                typeMessage("Good. You caught it early. Are you at home right now in a private place?", 
-                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('at_home')">Yes</button>
-                     <button class="btn-chat btn-no" onclick="handleAIResponse('in_public')">No</button>`);
-            }
-            else if (action === 'at_home') {
-                typeMessage("Do 10 push-ups or wash your face with cold water. Tell me when you are done.", 
-                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('done')">Done</button>`);
-            }
-            else if (action === 'in_public') {
-                typeMessage("Okay, just take 3 deep breaths and focus on the sounds around you. Tell me when you are done.", 
-                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('done')">Done</button>`);
-            }
-            else if (action === 'done') {
-                typeMessage("Perfect. You are grounded. What assignment or task can you focus on for 20 minutes right now?", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">I have a task</button>`);
+                typeMsg("That's great. Staying present is a win. Let's do a quick focus session to keep the momentum.", 
+                    `<button class="p-btn" onclick="switchView('focus'); closeAI();">Go to Focus</button>`);
+            } else if (action === 'struggled') {
+                typeMsg("I hear you. It's okay to struggle. Are you stuck in a daydream right now?", 
+                    `<button class="p-btn" onclick="reply('yes_md')">Yes</button><button class="p-btn no" onclick="reply('no_md')">No</button>`);
+            } else if (action === 'yes_md') {
+                typeMsg("Let's pull you back. I am opening a quick game. Click the tile that has a different color.", 
+                    `<button class="p-btn" onclick="startGame()">Start Game</button>`);
+            } else if (action === 'no_md') {
+                typeMsg("Good. You caught it early. Are you at home right now?", 
+                    `<button class="p-btn" onclick="reply('home')">Yes</button><button class="p-btn no" onclick="reply('public')">No</button>`);
+            } else if (action === 'home') {
+                typeMsg("Do 10 push-ups or wash your face with cold water. Tell me when you are done.", 
+                    `<button class="p-btn" onclick="reply('done')">Done</button>`);
+            } else if (action === 'public') {
+                typeMsg("Take 3 deep breaths and focus on the sounds around you. Tell me when you are done.", 
+                    `<button class="p-btn" onclick="reply('done')">Done</button>`);
+            } else if (action === 'done') {
+                typeMsg("Perfect. You are grounded. What task can you focus on for 20 minutes right now?", 
+                    `<button class="p-btn" onclick="closeAI()">I have a task</button>`);
             }
         }
 
         function startGame() {
-            actionArea.innerHTML = ''; 
-            actionArea.classList.remove('visible');
-            popupText.innerHTML = "Let's focus...";
-            gameArea.style.display = 'block';
-            gameScore = 0;
-            document.getElementById('score').innerText = gameScore;
-            generateGameLevel();
+            aiActions.innerHTML = ''; aiText.innerHTML = "Let's focus..."; gameBox.style.display = 'block'; gScore = 0;
+            document.getElementById('g-score').innerText = gScore; genGame();
         }
 
-        function generateGameLevel() {
-            grid.innerHTML = '';
-            const r = Math.floor(Math.random() * 150);
-            const g = Math.floor(Math.random() * 150);
-            const b = Math.floor(Math.random() * 150);
-            const currentBaseColor = `rgb(${r}, ${g}, ${b})`;
-            const currentOddColor = `rgb(${r + 40}, ${g + 40}, ${b + 40})`;
-            const oddIndex = Math.floor(Math.random() * 9);
-
+        function genGame() {
+            const grid = document.getElementById('g-grid'); grid.innerHTML = '';
+            const r = Math.floor(Math.random() * 150), g = Math.floor(Math.random() * 150), b = Math.floor(Math.random() * 150);
+            const base = `rgb(${r},${g},${b})`, odd = `rgb(${r+40},${g+40},${b+40})`, oddIdx = Math.floor(Math.random() * 9);
             for (let i = 0; i < 9; i++) {
-                const tile = document.createElement('div');
-                tile.classList.add('game-tile');
-                tile.style.background = (i === oddIndex) ? currentOddColor : currentBaseColor;
+                const tile = document.createElement('div'); tile.className = 'g-tile';
+                tile.style.background = (i === oddIdx) ? odd : base;
                 tile.onclick = () => {
-                    if (i === oddIndex) {
-                        gameScore++;
-                        document.getElementById('score').innerText = gameScore;
-                        if(gameScore < 5) { generateGameLevel(); } 
-                        else { endGame(); }
-                    } else {
-                        tile.style.transform = 'scale(0.9)';
-                        setTimeout(() => tile.style.transform = 'scale(1)', 100);
-                    }
+                    if (i === oddIdx) { gScore++; document.getElementById('g-score').innerText = gScore; if(gScore < 5) genGame(); else endGame(); }
                 };
                 grid.appendChild(tile);
             }
         }
 
         function endGame() {
-            gameArea.style.display = 'none';
-            typeMessage("You did it! You got 5 in a row. Your brain is focused on reality now. Are you at home?", 
-                `<button class="btn-chat btn-yes" onclick="handleAIResponse('at_home')">Yes</button>
-                 <button class="btn-chat btn-no" onclick="handleAIResponse('in_public')">No</button>`);
+            gameBox.style.display = 'none';
+            typeMsg("You did it! Your brain is focused on reality now. Are you at home?", 
+                `<button class="p-btn" onclick="reply('home')">Yes</button><button class="p-btn no" onclick="reply('public')">No</button>`);
         }
 
-        function updateTimer() {
-            let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            let s = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `${m}:${s}`;
-        }
-
-        function handleFocusButton() {
+        function handleFocus() {
             const btn = document.getElementById('start-btn');
             if (!isRunning) {
-                aiPopup.classList.add('show');
-                typeMessage("Nice bro. You are willing to enter focus mode. Be strong. Are you sure you can do this?", 
-                    `<button class="btn-chat btn-yes" onclick="confirmFocus()">Yes</button>
-                     <button class="btn-chat btn-no" onclick="closeAI()">No</button>`);
+                popup.classList.add('show');
+                typeMsg("Are you sure you can do this?", `<button class="p-btn" onclick="confirmFocus()">Yes</button><button class="p-btn no" onclick="closeAI()">No</button>`);
             } else {
-                clearInterval(timerInterval);
-                isRunning = false;
-                btn.innerText = "Start Focus";
-                btn.classList.remove('btn-stop');
-                aiPopup.classList.add('show');
-                typeMessage("Why did you stop? Did the urge to daydream get too strong? It's okay, let's talk about it.", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">The urge was strong</button>
-                     <button class="btn-chat btn-no" onclick="closeAI()">Just needed a break</button>`);
+                clearInterval(timerInt); isRunning = false; btn.innerText = "Start Focus"; btn.classList.remove('stop');
+                popup.classList.add('show');
+                typeMsg("Why did you stop? Did the urge get too strong?", `<button class="p-btn" onclick="closeAI()">The urge was strong</button><button class="p-btn no" onclick="closeAI()">Just a break</button>`);
             }
         }
 
         function confirmFocus() {
-            closeAI();
-            isRunning = true;
-            const btn = document.getElementById('start-btn');
-            btn.innerText = "Stop Focus";
-            btn.classList.add('btn-stop');
-            timerInterval = setInterval(() => {
-                if (timeLeft > 0) { 
-                    timeLeft--; 
-                    updateTimer(); 
-                } 
+            closeAI(); isRunning = true; const btn = document.getElementById('start-btn');
+            btn.innerText = "Stop Focus"; btn.classList.add('stop');
+            timerInt = setInterval(() => {
+                if (timeLeft > 0) { timeLeft--; document.getElementById('timer').innerText = `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`; }
                 else {
-                    clearInterval(timerInterval);
-                    isRunning = false;
-                    timeLeft = 25 * 60; updateTimer();
-                    btn.innerText = "Start Focus";
-                    btn.classList.remove('btn-stop');
-                    aiPopup.classList.add('show');
-                    typeMessage("You did it! You stayed grounded for the whole session. How do you feel now?", 
-                        `<button class="btn-chat btn-yes" onclick="closeAI()">I feel great</button>`);
+                    clearInterval(timerInt); isRunning = false; timeLeft = 25 * 60; btn.innerText = "Start Focus"; btn.classList.remove('stop');
+                    popup.classList.add('show');
+                    typeMsg("You did it! You stayed grounded. How do you feel now?", `<button class="p-btn" onclick="closeAI()">I feel great</button>`);
                 }
             }, 1000);
+            
         }
 
-        function createPost() {
-            let text = prompt("What would you like to share with the community?");
-            if (text && text.trim() !== "") {
-                const feed = document.getElementById('feed-container');
-                const newPost = document.createElement('div');
-                newPost.className = 'post';
-                newPost.innerHTML = `<div class="post-header"><div class="post-avatar" style="background:var(--primary); color:white;">M</div><strong>You</strong></div><div class="post-text">${text}</div>`;
-                feed.prepend(newPost);
-            }
-        }
-
-        function openSidebar() { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-        function closeSidebar() { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-
-        const cards = document.querySelectorAll('.carousel-card');
-        let cardIndex = 0;
-        setInterval(() => {
-            cards[cardIndex].classList.remove('active');
-            cardIndex = (cardIndex + 1) % cards.length;
-            cards[cardIndex].classList.add('active');
-        }, 4000);
-
-        const testimonials = [
-            '"I used to lose 4 hours a day. The focus timer gave me a reason to stay in the real world."',
-            '"The AI companion understands when I say I am slipping away."',
-            '"The brain visualizer made me realize how much time I was wasting."'
-        ];
-        let testIndex = 0;
-        setInterval(() => {
-            const el = document.getElementById('testimonial-text');
-            el.style.opacity = 0;
-            setTimeout(() => {
-                testIndex = (testIndex + 1) % testimonials.length;
-                el.innerText = testimonials[testIndex];
-                el.style.opacity = 1;
-            }, 500);
-        }, 10000);
-
-        window.onload = () => { 
-            updateTimer(); 
-            setTimeout(() => { openWelcomeAI(); }, 1000);
-        };
+        const cards = document.querySelectorAll('.card'); let cIdx = 0;
+        setInterval(() => { cards[cIdx].classList.remove('active'); cIdx = (cIdx + 1) % cards.length; cards[cIdx].classList.add('active'); }, 4000);
+        
+        window.onload = () => { startAI(); };
     </script>
 </body>
-            </html>
+</html>
+                                                                       </html>
+                                                                       
