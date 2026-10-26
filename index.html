@@ -81,6 +81,10 @@
         .action-area.visible { opacity: 1; }
         .btn-chat { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; }
         .btn-yes { background: #2563eb; color: white; } .btn-no { background: #333; color: white; }
+        .game-container { display: none; margin-top: 10px; background: #000; border-radius: 12px; padding: 15px; text-align: center; }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+        .game-tile { aspect-ratio: 1; border-radius: 8px; background: #333; cursor: pointer; }
+        .game-score { color: #aaa; font-size: 12px; font-weight: bold; }
         .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s; }
         .sidebar-overlay.active { display: block; opacity: 1; }
         .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--surface); z-index: 1001; transition: left 0.3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
@@ -93,15 +97,14 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .cursor { display: inline-block; width: 8px; height: 14px; background: #60a5fa; animation: blink 1s step-end infinite; }
     </style>
-</head>
-<body>
+</head><body>
 
     <header>
         <button class="profile-btn" onclick="openSidebar()">M</button>
         <div class="logo-center"><span class="black">alle</span><span class="blue">peed</span></div>
         <div class="header-controls">
             <div class="control-item"><button class="control-icon" onclick="toggleTheme()"><i class="fa-solid fa-gear"></i></button><span class="control-label" id="theme-label">Dark</span></div>
-            <div class="control-item"><button class="control-icon" style="color: var(--primary);" onclick="triggerAI()"><i class="fa-solid fa-star"></i></button><span class="control-label">AI</span></div>
+            <div class="control-item"><button class="control-icon" style="color: var(--primary);" onclick="openWelcomeAI()"><i class="fa-solid fa-star"></i></button><span class="control-label">AI</span></div>
         </div>
     </header>
 
@@ -154,6 +157,11 @@
         </div>
         <div class="popup-message" id="popup-text"></div>
         <div class="action-area" id="action-area"></div>
+        <div id="game-area" class="game-container">
+            <div class="game-score">Score: <span id="score">0</span></div>
+            <div class="game-grid" id="grid"></div>
+            <p style="font-size: 11px; color: #777; margin-top: 10px;">Click the odd color out.</p>
+        </div>
     </div>
 
     <div class="fab" id="fab" onclick="createPost()" style="display:none;"><i class="fa-solid fa-plus"></i></div>
@@ -186,6 +194,7 @@
         let timeLeft = 25 * 60;
         let timerInterval;
         let isRunning = false;
+        let gameScore = 0;
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         function toggleTheme() {
@@ -209,13 +218,19 @@
         const aiPopup = document.getElementById('ai-popup');
         const popupText = document.getElementById('popup-text');
         const actionArea = document.getElementById('action-area');
+        const gameArea = document.getElementById('game-area');
+        const grid = document.getElementById('grid');
 
-        function closeAI() { aiPopup.classList.remove('show'); }
+        function closeAI() { 
+            aiPopup.classList.remove('show'); 
+            gameArea.style.display = 'none';
+        }
 
         function typeMessage(text, buttonsHTML) {
             popupText.innerHTML = '';
             actionArea.innerHTML = '';
             actionArea.classList.remove('visible');
+            gameArea.style.display = 'none';
             let i = 0;
             const cursor = document.createElement('span'); 
             cursor.className = 'cursor'; 
@@ -235,34 +250,95 @@
                     } 
                 }
             }
-            setTimeout(type, 400);
+            setTimeout(type, 300);
         }
 
-        function triggerAI() {
+        function openWelcomeAI() {
             aiPopup.classList.add('show');
-            if (currentView === 'home') {
-                typeMessage("Hey Sankara, how was your day? Did you slip into MD?", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">I'm okay</button>
-                     <button class="btn-chat btn-no" onclick="closeAI()">I struggled</button>`);
+            typeMessage("Hey Sankara, how was your day? Did you fall into MD again?", 
+                `<button class="btn-chat btn-yes" onclick="handleAIResponse('okay')">I'm okay</button>
+                 <button class="btn-chat btn-no" onclick="handleAIResponse('struggled')">I struggled</button>`);
+        }
+
+        function handleAIResponse(action) {
+            actionArea.innerHTML = '';
+            actionArea.classList.remove('visible');
+
+            if (action === 'okay') {
+                typeMessage("That's great. Staying present is a win. Let's do a quick focus session to keep the momentum.", 
+                    `<button class="btn-chat btn-yes" onclick="switchView('focus'); closeAI();">Go to Focus</button>`);
             } 
-            else if (currentView === 'focus') {
-                if (isRunning) {
-                    let m = Math.floor(timeLeft / 60);
-                    typeMessage(`I see you are in focus mode. You have ${m} minutes left. You can do this. Keep going.`, 
-                        `<button class="btn-chat btn-yes" onclick="closeAI()">I'll keep going</button>`);
-                } else {
-                    typeMessage("I see you are in the focus section. Ready to start a session?", 
-                        `<button class="btn-chat btn-yes" onclick="closeAI(); handleFocusButton();">Start</button>`);
-                }
+            else if (action === 'struggled') {
+                typeMessage("I hear you. It's okay to struggle. Are you stuck in a daydream right now?", 
+                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('yes_md')">Yes</button>
+                     <button class="btn-chat btn-no" onclick="handleAIResponse('no_md')">No</button>`);
             }
-            else if (currentView === 'community') {
-                typeMessage("You are in the community. You are not alone. Remember to be kind to yourself.", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">Okay</button>`);
+            else if (action === 'yes_md') {
+                typeMessage("Let's pull you back. I am opening a quick game. Click the tile that has a different color.", 
+                    `<button class="btn-chat btn-yes" onclick="startGame()">Start Game</button>`);
             }
-            else if (currentView === 'progress') {
-                typeMessage("Looking at your progress? Remember, a difficult day does not erase your previous wins.", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">Thanks</button>`);
+            else if (action === 'no_md') {
+                typeMessage("Good. You caught it early. Are you at home right now in a private place?", 
+                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('at_home')">Yes</button>
+                     <button class="btn-chat btn-no" onclick="handleAIResponse('in_public')">No</button>`);
             }
+            else if (action === 'at_home') {
+                typeMessage("Do 10 push-ups or wash your face with cold water. Tell me when you are done.", 
+                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('done')">Done</button>`);
+            }
+            else if (action === 'in_public') {
+                typeMessage("Okay, just take 3 deep breaths and focus on the sounds around you. Tell me when you are done.", 
+                    `<button class="btn-chat btn-yes" onclick="handleAIResponse('done')">Done</button>`);
+            }
+            else if (action === 'done') {
+                typeMessage("Perfect. You are grounded. What assignment or task can you focus on for 20 minutes right now?", 
+                    `<button class="btn-chat btn-yes" onclick="closeAI()">I have a task</button>`);
+            }
+        }
+
+        function startGame() {
+            actionArea.innerHTML = ''; 
+            actionArea.classList.remove('visible');
+            popupText.innerHTML = "Let's focus...";
+            gameArea.style.display = 'block';
+            gameScore = 0;
+            document.getElementById('score').innerText = gameScore;
+            generateGameLevel();
+        }
+
+        function generateGameLevel() {
+            grid.innerHTML = '';
+            const r = Math.floor(Math.random() * 150);
+            const g = Math.floor(Math.random() * 150);
+            const b = Math.floor(Math.random() * 150);
+            const currentBaseColor = `rgb(${r}, ${g}, ${b})`;
+            const currentOddColor = `rgb(${r + 40}, ${g + 40}, ${b + 40})`;
+            const oddIndex = Math.floor(Math.random() * 9);
+
+            for (let i = 0; i < 9; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('game-tile');
+                tile.style.background = (i === oddIndex) ? currentOddColor : currentBaseColor;
+                tile.onclick = () => {
+                    if (i === oddIndex) {
+                        gameScore++;
+                        document.getElementById('score').innerText = gameScore;
+                        if(gameScore < 5) { generateGameLevel(); } 
+                        else { endGame(); }
+                    } else {
+                        tile.style.transform = 'scale(0.9)';
+                        setTimeout(() => tile.style.transform = 'scale(1)', 100);
+                    }
+                };
+                grid.appendChild(tile);
+            }
+        }
+
+        function endGame() {
+            gameArea.style.display = 'none';
+            typeMessage("You did it! You got 5 in a row. Your brain is focused on reality now. Are you at home?", 
+                `<button class="btn-chat btn-yes" onclick="handleAIResponse('at_home')">Yes</button>
+                 <button class="btn-chat btn-no" onclick="handleAIResponse('in_public')">No</button>`);
         }
 
         function updateTimer() {
@@ -354,13 +430,8 @@
 
         window.onload = () => { 
             updateTimer(); 
-            setTimeout(() => { 
-                aiPopup.classList.add('show');
-                typeMessage("Hey Sankara, how was your day? Did you fall into MD again, or did it go well?", 
-                    `<button class="btn-chat btn-yes" onclick="closeAI()">It was good</button>
-                     <button class="btn-chat btn-no" onclick="closeAI()">I struggled</button>`);
-            }, 1000);
+            setTimeout(() => { openWelcomeAI(); }, 1000);
         };
     </script>
 </body>
-</html>
+            </html>
