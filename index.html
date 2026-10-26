@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- PWA TAGS: Forces full screen app mode when added to home screen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2563eb">
+    
+    <title>Allepeed</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #f5f5f5; --surface: #ffffff; --text: #111111; --muted: #737373; --border: #e5e5e5;
+            --primary: #2563eb; --icon-bg: #e5e7eb; --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --red-alert: #ef4444; --green-ok: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212; --surface: #1e1e1e; --text: #f5f5f5; --muted: #a3a3a3; --border: #333333;
+            --icon-bg: #333333; --card-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
+
+        /* --- HEADER --- */
+        header { height: 80px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; padding-top: env(safe-area-inset-top); }
+        .profile-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; cursor: pointer; border: none; }
+        .logo-center { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+        .logo-center .black { color: var(--text); } .logo-center .blue { color: var(--primary); }
+        .header-controls { display: flex; gap: 15px; }
+        .control-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .control-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--icon-bg); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: var(--text); border: none; transition: transform 0.2s; }
+        .control-icon:active { transform: scale(0.9); }
+        .control-label { font-size: 9px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- MAIN CONTENT --- */
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; position: relative; }
+        .screen { display: none; animation: fadeIn 0.3s; height: 100%; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* HOME */
+        .carousel-wrapper { position: relative; height: 140px; margin-bottom: 20px; width: 100%; }
+        .carousel-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 16px; padding: 20px; color: white; display: flex; flex-direction: column; justify-content: center; box-shadow: var(--card-shadow); opacity: 0; transition: opacity 0.8s; }
+        .carousel-card.active { opacity: 1; z-index: 2; }
+        .carousel-card h2 { font-size: 18px; margin-bottom: 8px; }
+        .carousel-card p { font-size: 13px; opacity: 0.9; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .dash-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px; box-shadow: var(--card-shadow); text-align: center; }
+        .dash-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+        .progress-number { font-size: 32px; font-weight: 900; color: var(--primary); }
+        .testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 25px; }
+        .testimonial-text { font-size: 14px; font-style: italic; line-height: 1.5; transition: opacity 0.5s; }
+        .brain-container { display: flex; gap: 15px; }
+        .brain-box { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 15px; text-align: center; }
+        .brain-visual { position: relative; width: 60px; height: 60px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+        .ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px dashed; animation: spin 6s linear infinite; }
+        .brain-icon { font-size: 30px; animation: spin-reverse 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } } @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+        .brain-left .ring, .brain-left .brain-icon { color: var(--red-alert); border-color: var(--red-alert); }
+        .brain-right .ring, .brain-right .brain-icon { color: var(--green-ok); border-color: var(--green-ok); }
+        .brain-desc { font-size: 11px; color: var(--muted); min-height: 45px; }
+
+        /* FOCUS */
+        .timer-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; margin-top: 50px; }
+        .timer-display { font-size: 80px; font-weight: 900; color: var(--primary); margin-bottom: 30px; font-variant-numeric: tabular-nums; }
+        .btn-main { width: 100%; max-width: 300px; padding: 18px; border-radius: 16px; border: none; background: var(--primary); color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-stop { background: var(--red-alert); }
+
+        /* COMMUNITY */
+        .post { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .post-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .post-text { font-size: 14px; line-height: 1.4; }
+        .fab { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,99,235,0.4); cursor: pointer; z-index: 90; }
+
+        /* PROGRESS */
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-between; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .bar { width: 12%; background: var(--primary); border-radius: 4px 4px 0 0; opacity: 0.8; }
+        .progress-bar-row { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .color-box { width: 20px; height: 20px; border-radius: 4px; }
+
+        /* FOOTER */
+        footer { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 600; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 20px; }
+
+        /* AI POPUP */
+        .ai-popup { position: fixed; top: 20px; left: 50%; transform: translate(-50%, -200px); width: 92%; max-width: 400px; background: #111; color: white; padding: 16px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; opacity: 0; pointer-events: none; }
+        .ai-popup.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+        .popup-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .popup-title { font-size: 12px; font-weight: 700; color: #60a5fa; text-transform: uppercase; }
+        .close-btn { background: none; border: none; color: #a3a3a3; font-size: 18px; cursor: pointer; }
+        .popup-message { font-size: 15px; line-height: 1.4; min-height: 40px; margin-bottom: 15px; }
+        .action-area { display: flex; gap: 10px; opacity: 0; transition: opacity 0.3s; }
+        .action-area.visible { opacity: 1; }
+        .btn-chat { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .btn-yes { background: #2563eb; color: white; } .btn-no { background: #333; color: white; }
+
+        /* SIDEBAR */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: var(--surface); z-index: 1001; transition: left 0.3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .sidebar-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; font-size: 32px; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; }
+        .sidebar-menu { list-style: none; padding: 15px 0; flex: 1; }
+        .sidebar-menu li { padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 15px; cursor: pointer; }
+        .sidebar-menu li:hover { background: var(--bg); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="profile-btn" onclick="openSidebar()">M</button>
+        <div class="logo-center"><span class="black">alle</span><span class="blue">peed</span></div>
+        <div class="header-controls">
+            <div class="control-item"><button class="control-icon" onclick="toggleTheme()"><i class="fa-solid fa-gear"></i></button><span class="control-label" id="theme-label">Dark</span></div>
+            <div class="control-item"><button class="control-icon" style="color: var(--primary);" onclick="triggerAI()"><i class="fa-solid fa-star"></i></button><span class="control-label">AI</span></div>
+        </div>
+    </header>
+
+    <main>
+        <div id="view-home" class="screen active">
+            <div class="carousel-wrapper">
+                <div class="carousel-card active" style="background: linear-gradient(135deg, var(--primary), #1e40af);"><h2>Welcome to Allepeed</h2><p>We help you find meaning in Maladaptive Daydreaming.</p></div>
+                <div class="carousel-card" style="background: linear-gradient(135deg, #10b981, #047857);"><h2>You are not alone.</h2><p>Thousands are fighting the same battle.</p></div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dash-box"><div class="dash-title">Progress</div><div class="progress-number">12</div></div>
+                <div class="dash-box"><div class="dash-title">Focus</div><i class="fa-regular fa-clock" style="font-size:32px; color:var(--primary);"></i></div>
+            </div>
+            <div class="testimonial-card"><div class="testimonial-text" id="testimonial-text">"I used to lose 4 hours a day. The focus timer gave me a reason to stay in the real world."</div></div>
+            <div class="brain-container">
+                <div class="brain-box brain-left"><div class="brain-visual"><div class="ring"></div><i class="fa-solid fa-brain brain-icon"></i></div><div class="brain-desc">Without Allepeed, your brain is filled with misery...</div></div>
+                <div class="brain-box brain-right"><div class="brain-visual"><div class="ring"></div><i class="fa-solid fa-brain brain-icon"></i></div><div class="brain-desc">Your brain becomes healthy and grounded after using Allepeed.</div></div>
+            </div>
+        </div>
+
+        <div id="view-focus" class="screen">
+            <div class="timer-container">
+                <div class="timer-display" id="timer">25:00</div>
+                <button class="btn-main" id="start-btn" onclick="handleFocusButton()">Start Focus</button>
+            </div>
+        </div>
+
+        <div id="view-community" class="screen">
+            <div id="feed-container">
+                <div class="post"><div class="post-header"><div class="post-avatar">A</div><strong>Anonymous</strong></div><div class="post-text">Today I stayed present for 30 minutes. The timer helped.</div></div>
+            </div>
+        </div>
+
+        <div id="view-progress" class="screen">
+            <h2 style="margin-bottom:15px;">Weekly Focus Activity</h2>
+            <div class="chart-container">
+                <div class="bar" style="height: 40%;"></div><div class="bar" style="height: 70%;"></div><div class="bar" style="height: 30%;"></div><div class="bar" style="height: 90%;"></div><div class="bar" style="height: 60%;"></div><div class="bar" style="height: 20%;"></div><div class="bar" style="height: 80%;"></div>
+            </div>
+            <h2 style="margin-bottom:15px;">Grounding Colors</h2>
+            <div class="progress-bar-row"><div class="color-box" style="background:var(--green-ok);"></div><span>Strong and Present</span></div>
+            <div class="progress-bar-row"><div class="color-box" style="background:#f59e0b;"></div><span>Struggling but Trying</span></div>
+            <div class="progress-bar-row"><div class="color-box" style="background:var(--red-alert);"></div><span>Daydreaming Heavily</span></div>
+        </div>
+    </main>
+
+    <div id="ai-popup" class="ai-popup">
+        <div class="popup-header">
+            <span class="popup-title"><i class="fa-solid fa-star"></i> Allepeed AI</span>
+            <button class="close-btn" onclick="closeAI()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="popup-message" id="popup-text"></div>
+        <div class="action-area" id="action-area"></div>
+    </div>
+
+    <div class="fab" id="fab" onclick="createPost()" style="display:none;"><i class="fa-solid fa-plus"></i></div>
+
+    <div id="overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">M</div>
+            <button style="padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text);">Edit Profile</button>
+        </div>
+        <ul class="sidebar-menu">
+            <li onclick="switchView('home')"><i class="fa-solid fa-house"></i> Home</li>
+            <li onclick="switchView('focus')"><i class="fa-solid fa-bolt"></i> Focus</li>
+            <li onclick="switchView('community')"><i class="fa-solid fa-users"></i> Community</li>
+            <li onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i> My Progress</li>
+            <li onclick="alert('App still in development.')"><i class="fa-solid fa-file-contract"></i> Terms</li>
+            <li onclick="alert('App still in development.')"><i class="fa-solid fa-gear"></i> Settings</li>
+        </ul>
+    </div>
+
+    <footer>
+        <div class="nav-item active" id="nav-home" onclick="switchView('home')"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item" id="nav-focus" onclick="switchView('focus')"><i class="fa-solid fa-bolt"></i><span>Focus</span></div>
+        <div class="nav-item" id="nav-community" onclick="switchView('community')"><i class="fa-solid fa-users"></i><span>Community</span></div>
+        <div class="nav-item" id="nav-progress" onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i><span>Progress</span></div>
+    </footer>
+
+    <script>
+        // --- 1. GLOBAL STATE ---
+        let currentView = 'home';
+        let timeLeft = 25 * 60;
+        let timerInterval;
+        let isRunning = false;
+
+        // Theme
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        function toggleTheme() {
+            let t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('theme', t);
+            document.getElementById('theme-label').innerText = t === 'dark' ? 'Light' : 'Dark';
+        }
+
+        // --- 2. NAVIGATION ---
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`view-${view}`).classList.add('active');
+            document.getElementById(`nav-${view}`).classList.add('active');
+            
+            closeSidebar();
+            document.getElementById('fab').style.display = (view === 'community') ? 'flex' : 'none';
+            
+            // If user navigates away from focus while timer is running, stop it (optional safety)
+            if (view !== 'focus' && isRunning) {
+                // Let it run in background, but the user can't see it. 
+                // For V1, we will just let it keep running.
+            }
+            
+            // AI Context Awareness
+            closeAI(); // Close AI when switching screens
+        }
+
+        // --- 3. AI ENGINE ---
+        const aiPopup = document.getElementById('ai-popup');
+        const popupText = document.getElementById('popup-text');
+        const actionArea = document.getElementById('action-area');
+
+        function closeAI() {
+            aiPopup.classList.remove('show');
+        }
+
+        function typeMessage(text, buttonsHTML) {
+            popupText.innerHTML = '';
+            actionArea.innerHTML = '';
+            actionArea.classList.remove('visible');
+            let i = 0;
+            const cursor = document.createElement('span'); 
+            cursor.className = 'cursor'; 
+            cursor.style.display = 'inline-block';
+            cursor.style.width = '8px';
+            cursor.style.height = '14px';
+            cursor.style.background = '#60a5fa';
+            cursor.style.animation = 'blink 1s step-end infinite';
+            popupText.appendChild(cursor);
+
+            function type() {
+                if (i < text.length) { 
+                    cursor.insertAdjacentText('beforebegin', text.charAt(i)); 
+                    i++; 
+                    setTimeout(type, 30); 
+                } 
+                else { 
+                    cursor.remove(); 
+                    if (buttonsHTML) { 
+                        actionArea.innerHTML = buttonsHTML; 
+                        actionArea.classList.add('visible'); 
+                    } 
+                }
+            }
+            setTimeout(type, 400);
+        }
+
+        // Trigger AI based on current screen
+        function triggerAI() {
+            aiPopup.classList.add('show');
+            
+            if (currentView === 'home') {
+        
