@@ -75,8 +75,22 @@
         .post-head { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
         .post-txt { font-size: 14px; }
         .fab { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 24px; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 90; }
+        
+        /* Mute overlay to bypass autoplay policies */
+        .start-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white; transition: opacity 0.5s; }
+        .start-btn { background: var(--primary); color: white; padding: 15px 30px; border-radius: 30px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
-</head><body>
+</head>
+<body>
+
+    <!-- OVERLAY TO BYPASS CHROME AUTOPLAY BLOCK -->
+    <div id="start-overlay" class="start-overlay">
+        <i class="fa-solid fa-star" style="font-size: 50px; color: var(--primary); margin-bottom: 20px;"></i>
+        <h2>Allepeed AI is ready</h2>
+        <p style="margin-top: 10px; color: #aaa;">Tap to start your session</p>
+        <button class="start-btn" onclick="startApp()">Enter App</button>
+    </div>
+
     <header>
         <button class="profile-btn" onclick="openSidebar()">M</button>
         <div class="logo"><span style="color:var(--text)">alle</span><span>peed</span></div>
@@ -87,6 +101,7 @@
     </header>
 
     <main>
+        <!-- ... (Main content HTML stays the same, omitted for brevity here but included in full code) ... -->
         <div id="view-home" class="screen active">
             <div class="carousel">
                 <div class="card active" style="background: linear-gradient(135deg, var(--primary), #1e40af);"><h2>Welcome to Allepeed</h2><p>We help you find meaning in Maladaptive Daydreaming.</p></div>
@@ -121,7 +136,13 @@
     </main>
 
     <div id="ai-popup" class="popup">
-        <div class="p-head"><span><i class="fa-solid fa-star"></i> Allepeed AI</span><button class="p-close" onclick="closeAI()"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="p-head">
+            <span><i class="fa-solid fa-star"></i> Allepeed AI</span>
+            <div style="display:flex; gap:10px;">
+                <button class="p-close" onclick="toggleMute()"><i class="fa-solid fa-volume-high" id="mute-icon"></i></button>
+                <button class="p-close" onclick="closeAI()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
         <div class="p-msg" id="ai-text"></div>
         <div class="p-actions" id="ai-actions"></div>
         <div id="game-box" class="game"><div class="g-score">Score: <span id="g-score">0</span></div><div class="g-grid" id="g-grid"></div></div>
@@ -139,7 +160,6 @@
             <li onclick="switchView('progress')"><i class="fa-solid fa-chart-line"></i> My Progress</li>
             <li onclick="alert('Coming soon!')"><i class="fa-solid fa-gear"></i> Settings</li>
             <li onclick="alert('Allepeed V1.0 - Built by Sankara')"><i class="fa-solid fa-circle-info"></i> About Us</li>
-            <li onclick="alert('Terms coming soon.')"><i class="fa-solid fa-file-contract"></i> Terms of Use</li>
         </ul>
     </div>
 
@@ -152,6 +172,26 @@
 
     <script>
         let currentView = 'home', timeLeft = 25 * 60, timerInt, isRunning = false, gScore = 0;
+        let isMuted = false;
+        
+        // --- VOICE ENGINE STATE ---
+        const synth = window.speechSynthesis;
+        let voiceRunId = 0;
+
+        // Auto-play bypass: Wait for user to tap the start overlay
+        function startApp() {
+            document.getElementById('start-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-overlay').style.display = 'none';
+            }, 500);
+            
+            // Prime the speech engine with a silent utterance
+            const silent = new SpeechSynthesisUtterance('');
+            synth.speak(silent);
+            
+            // Now speak the greeting
+            setTimeout(() => { startAI(); }, 800);
+        }
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         function toggleTheme() {
@@ -176,9 +216,70 @@
 
         const popup = document.getElementById('ai-popup'), aiText = document.getElementById('ai-text'), aiActions = document.getElementById('ai-actions'), gameBox = document.getElementById('game-box');
 
-        function closeAI() { popup.classList.remove('show'); gameBox.style.display = 'none'; }
+        // --- MUTE LOGIC ---
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('mute-icon');
+            if (isMuted) {
+                icon.className = 'fa-solid fa-volume-xmark';
+                synth.cancel(); // Stop current speech
+            } else {
+                icon.className = 'fa-solid fa-volume-high';
+                // Re-speak the current text if unmuted
+                speakWarmly(aiText.innerText);
+            }
+        }
+
+        // --- THE WARM VOICE ENGINE ---
+        function stopSpeech() { 
+            voiceRunId++; 
+            synth.cancel(); 
+        }
+
+        function speakWarmly(text) {
+            if (isMuted) return;
+            stopSpeech();
+            const currentRun = voiceRunId;
+            
+            // Split text into natural chunks (sentences)
+            const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+            
+            let index = 0;
+            function next() {
+                if (currentRun !== voiceRunId || index >= sentences.length) return;
+                
+                const sentence = sentences[index++].trim();
+                if (!sentence) return next();
+
+                const utterance = new SpeechSynthesisUtterance(sentence);
+                utterance.lang = "en-US";
+                utterance.rate = 0.92; // Slightly slower for warmth
+                utterance.pitch = 1.0;
+                
+                utterance.onend = () => {
+                    if (currentRun !== voiceRunId) return;
+                    setTimeout(next, 450); // Natural pause between sentences
+                };
+                
+                utterance.onerror = (e) => {
+                    if (currentRun === voiceRunId) next(); 
+                };
+                
+                synth.speak(utterance);
+            }
+            next();
+        }
+        function closeAI() { 
+            popup.classList.remove('show'); 
+            gameBox.style.display = 'none'; 
+            stopSpeech();
+        }
 
         function typeMsg(text, buttonsHtml) {
+            // Speak the text
+            speakWarmly(text);
+
+            // Type visually
             aiText.innerHTML = ''; aiActions.innerHTML = ''; aiActions.classList.remove('visible'); gameBox.style.display = 'none';
             let i = 0; const cursor = document.createElement('span'); cursor.className = 'cursor'; aiText.appendChild(cursor);
             function type() {
@@ -188,24 +289,25 @@
             setTimeout(type, 300);
         }
 
+        // --- CONVERSATION LOGIC ---
         function startAI() {
             popup.classList.add('show');
             if (currentView === 'home') {
-                typeMsg("Hey Sankara, how was your day? Did you slip into MD?", 
+                typeMsg("Hey Sankara... welcome back. How was your day? Did you slip into a daydream?", 
                     `<button class="p-btn" onclick="reply('okay')">I'm okay</button><button class="p-btn no" onclick="reply('struggled')">I struggled</button>`);
             } else if (currentView === 'focus') {
                 if (isRunning) {
-                    typeMsg(`I see you are in focus mode. You have ${Math.floor(timeLeft/60)} minutes left. Keep going!`, 
+                    typeMsg(`I see you are in focus mode. You have ${Math.floor(timeLeft/60)} minutes left. Keep going. You can do this.`, 
                         `<button class="p-btn" onclick="closeAI()">I'll keep going</button>`);
                 } else {
-                    typeMsg("Ready to start a focus session? Let's do it.", 
+                    typeMsg("Ready to start a focus session? Let's do it together.", 
                         `<button class="p-btn" onclick="closeAI(); handleFocus()">Start</button>`);
                 }
             } else if (currentView === 'community') {
-                typeMsg("You are in the community. You are not alone. Be kind to yourself.", 
+                typeMsg("You are in the community. You are not alone. Remember to be kind to yourself.", 
                     `<button class="p-btn" onclick="closeAI()">Okay</button>`);
             } else if (currentView === 'progress') {
-                typeMsg("Looking at your progress? A difficult day does not erase your previous wins.", 
+                typeMsg("Looking at your progress? Remember, a difficult day does not erase your previous wins.", 
                     `<button class="p-btn" onclick="closeAI()">Thanks</button>`);
             }
         }
@@ -216,13 +318,13 @@
                 typeMsg("That's great. Staying present is a win. Let's do a quick focus session to keep the momentum.", 
                     `<button class="p-btn" onclick="switchView('focus'); closeAI();">Go to Focus</button>`);
             } else if (action === 'struggled') {
-                typeMsg("I hear you. It's okay to struggle. Are you stuck in a daydream right now?", 
+                typeMsg("I hear you... it's okay to struggle. Are you stuck in a daydream right now?", 
                     `<button class="p-btn" onclick="reply('yes_md')">Yes</button><button class="p-btn no" onclick="reply('no_md')">No</button>`);
             } else if (action === 'yes_md') {
                 typeMsg("Let's pull you back. I am opening a quick game. Click the tile that has a different color.", 
                     `<button class="p-btn" onclick="startGame()">Start Game</button>`);
             } else if (action === 'no_md') {
-                typeMsg("Good. You caught it early. Are you at home right now?", 
+                typeMsg("Good... you caught it early. Are you at home right now?", 
                     `<button class="p-btn" onclick="reply('home')">Yes</button><button class="p-btn no" onclick="reply('public')">No</button>`);
             } else if (action === 'home') {
                 typeMsg("Do 10 push-ups or wash your face with cold water. Tell me when you are done.", 
@@ -236,7 +338,9 @@
             }
         }
 
+        // --- GAME LOGIC ---
         function startGame() {
+            stopSpeech(); 
             aiActions.innerHTML = ''; aiText.innerHTML = "Let's focus..."; gameBox.style.display = 'block'; gScore = 0;
             document.getElementById('g-score').innerText = gScore; genGame();
         }
@@ -257,10 +361,11 @@
 
         function endGame() {
             gameBox.style.display = 'none';
-            typeMsg("You did it! Your brain is focused on reality now. Are you at home?", 
+            typeMsg("You did it... your brain is focused on reality now. Are you at home?", 
                 `<button class="p-btn" onclick="reply('home')">Yes</button><button class="p-btn no" onclick="reply('public')">No</button>`);
         }
 
+        // --- FOCUS LOGIC ---
         function handleFocus() {
             const btn = document.getElementById('start-btn');
             if (!isRunning) {
@@ -300,8 +405,8 @@
         const cards = document.querySelectorAll('.card'); let cIdx = 0;
         setInterval(() => { cards[cIdx].classList.remove('active'); cIdx = (cIdx + 1) % cards.length; cards[cIdx].classList.add('active'); }, 4000);
         
-        window.onload = () => { startAI(); };
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
     </script>
 </body>
 </html>
-                                                                                                                       </html>
+     
